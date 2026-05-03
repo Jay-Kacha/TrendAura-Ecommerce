@@ -1,0 +1,61 @@
+@model IEnumerable<trendaura.Models.Order>
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<h3 class="mb-4">Orders</h3>
+
+<div class="admin-card">
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Date</th>
+                    <th>Payment</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model)
+                {
+                    <tr>
+                        <td><strong>@o.Id</strong></td>
+                        <td>@(o.User?.FullName ?? "N/A")</td>
+                        <td>@(o.User?.Email ?? o.UserId)</td>
+                        <td>@o.OrderDate.ToLocalTime().ToString("MMM dd, yyyy")</td>
+                        <td>
+                            @if (o.PaymentMethod == "Cash on Delivery")
+                            {
+                                <small><i class="fa-solid fa-hand-holding-dollar me-1"></i>COD</small>
+                            }
+                            else
+                            {
+                                <small><i class="fa-solid fa-credit-card me-1"></i>Online</small>
+                            }
+                            <br />
+                            <span class="badge badge-sm bg-@(o.PaymentStatus == "Paid" ? "success" : "warning")">
+                                @o.PaymentStatus
+                            </span>
+                        </td>
+                        <td><strong>Rs @o.TotalAmount.ToString("0.00")</strong></td>
+                        <td>
+                            <span class="badge bg-@(o.Status == "Delivered" ? "success" : o.Status == "Cancelled" ? "danger" : "warning")">
+                                @o.Status
+                            </span>
+                        </td>
+                        <td>
+                            <a asp-area="Admin" asp-controller="Orders" asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-primary">
+                                <i class="fa-solid fa-eye me-1"></i> Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,271 @@
+@model trendaura.ViewModels.AdminLoginViewModel
+@{
+    ViewData["Title"] = "Admin Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - Mobile Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #D2B48C 0%, #F5F5DC 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .admin-login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+
+        .admin-login-card {
+            background: #fff8f0;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(139, 69, 19, 0.3);
+            overflow: hidden;
+        }
+
+        .admin-login-header {
+            background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: #fff8f0;
+        }
+
+            .admin-login-header .admin-icon {
+                width: 80px;
+                height: 80px;
+                background: rgba(255, 248, 240, 0.2);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+                backdrop-filter: blur(10px);
+                color: #fff8f0;
+            }
+
+            .admin-login-header h3,
+            .admin-login-header p {
+                color: #fff8f0;
+                margin: 0;
+            }
+
+        .admin-login-body {
+            padding: 40px 30px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #8B4513;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border: 2px solid #D2B48C;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus {
+                border-color: #8B4513;
+                box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.15);
+            }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+            .input-icon-wrapper .input-icon {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #8B4513;
+            }
+
+            .input-icon-wrapper .form-control {
+                padding-left: 45px;
+            }
+
+        .btn-admin-login {
+            background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            color: #fff8f0;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+            .btn-admin-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(139, 69, 19, 0.4);
+                color: #fff8f0;
+            }
+
+        .form-check-input:checked {
+            background-color: #8B4513;
+            border-color: #8B4513;
+        }
+
+        .back-to-store {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .back-to-store a {
+                color: #8B4513;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+                .back-to-store a:hover {
+                    color: #5C3317;
+                }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+        }
+
+            .divider::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: #D2B48C;
+            }
+
+            .divider span {
+                background: #fff8f0;
+                padding: 0 15px;
+                position: relative;
+                color: #8B4513;
+                font-size: 13px;
+            }
+
+        .text-muted {
+            color: #8B4513 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-login-container">
+        <div class="admin-login-card">
+            <div class="admin-login-header">
+                <div class="admin-icon">
+                    <i class="fa-solid fa-shield-halved fa-3x"></i>
+                </div>
+                <h3>Admin Portal</h3>
+                <p>Mobile Store Management System</p>
+            </div>
+
+            <div class="admin-login-body">
+                @if (TempData["error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fa-solid fa-exclamation-circle me-2"></i>@TempData["error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="fa-solid fa-check-circle me-2"></i>@TempData["success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form asp-action="Login" method="post">
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label">
+                            <i class="fa-solid fa-user me-2"></i>Username
+                        </label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-user input-icon"></i>
+                            <input asp-for="Username" class="form-control" placeholder="Enter admin username" autofocus />
+                        </div>
+                        <span asp-validation-for="Username" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">
+                            <i class="fa-solid fa-lock me-2"></i>Password
+                        </label>
+                        <div class="input-icon-wrapper">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input asp-for="Password" type="password" class="form-control" placeholder="Enter admin password" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input asp-for="RememberMe" class="form-check-input" />
+                            <label asp-for="RememberMe" class="form-check-label">
+                                Keep me signed in
+                            </label>
+                        </div>
+                    </div>
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <button type="submit" class="btn btn-admin-login">
+                        <i class="fa-solid fa-sign-in-alt me-2"></i>Sign In to Admin Panel
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>ADMIN ACCESS ONLY</span>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-muted small mb-0">
+                        <i class="fa-solid fa-lock me-1"></i>
+                        This is a secure admin area. Only authorized personnel can access.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-to-store">
+            <a asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="fa-solid fa-arrow-left me-2"></i>Back to Store
+            </a>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

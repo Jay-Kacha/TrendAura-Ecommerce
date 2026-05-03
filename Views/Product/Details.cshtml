@@ -1,0 +1,310 @@
+@model trendaura.ViewModels.ProductReviewsViewModel
+@inject UserManager<ApplicationUser> _userManager
+@{
+    ViewData["Title"] = Model.Product.Name;
+}
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb" style="background-color:#111111; border: 1px solid #FFC107; border-radius: 8px; padding: 12px 15px;">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" style="color: #FFC107;">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Product" asp-action="Index" style="color: #FFC107;">Products</a></li>
+            <li class="breadcrumb-item active" style="color: #FFC107;">@Model.Product.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-5 mb-4">
+            <div class="product-card" style="border: 2px solid #FFC107; background-color: #111111;">
+                <img src="@(string.IsNullOrEmpty(Model.Product.ImageUrl) ? "/images/placeholder.png" : Model.Product.ImageUrl)"
+                     alt="@Model.Product.Name"
+                     class="product-detail-image"
+                     style="width: 100%; height: 400px; object-fit: contain; padding: 20px; background-color: #000000;" />
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-md-7">
+            <div class="admin-card" style="background-color: #111111; border: 2px solid #FFC107; padding: 20px; border-radius: 8px;">
+                <h2 class="mb-3" style="color: #FFC107; font-weight: 700;">@Model.Product.Name</h2>
+
+                @if (Model.Product.Category != null)
+                {
+                    <p class="mb-3" style="color: #FFC107;">
+                        <i class="fa-solid fa-tag me-2"></i>
+                        <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@Model.Product.CategoryId" style="color: #FFC107;">@Model.Product.Category.Name</a>
+                    </p>
+                }
+
+                <!-- Star Rating Display -->
+                <div class="mb-3">
+                    @if (Model.Product.ReviewCount > 0)
+                    {
+                        <div class="d-flex align-items-center justify-content-start">
+                            <div class="star-rating me-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Floor(Model.AverageRating))
+                                    {
+                                        <i class="fa-solid fa-star" style="color: #FFC107; font-size: 1.1rem; margin-right: 3px;"></i>
+                                    }
+                                    else if (i == Math.Ceiling(Model.AverageRating) && Model.AverageRating % 1 >= 0.5)
+                                    {
+                                        <i class="fa-solid fa-star-half-stroke" style="color: #FFC107; font-size: 1.1rem; margin-right: 3px;"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-regular fa-star" style="color: #333333; font-size: 1.1rem; margin-right: 3px;"></i>
+                                    }
+                                }
+                            </div>
+                            <span class="fw-bold me-2" style="color: #FFC107;">@Model.AverageRating.ToString("0.0")</span>
+                            <span style="color: #FFC107;">(@Model.Product.ReviewCount @(Model.Product.ReviewCount == 1 ? "review" : "reviews"))</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="color: #FFC107;">
+                            <i class="fa-regular fa-star"></i>
+                            No reviews yet - Be the first to review!
+                        </div>
+                    }
+                </div>
+
+                <h3 class="price mb-4" style="color: #FFC107; font-weight: 700; font-size: 1.8rem;">Rs @Model.Product.Price.ToString("0.00")</h3>
+
+                <div class="mb-4">
+                    <h5 style="color: #FFC107; font-weight: 600;">Description</h5>
+                    <p style="color: #FFC107;">@Model.Product.Description</p>
+                </div>
+
+                <!-- Add to Cart -->
+                <form asp-controller="Cart" asp-action="Add" method="post" class="mb-3">
+                    <input type="hidden" name="productId" value="@Model.Product.Id" />
+                    <div class="row align-items-end">
+                        <div class="col-auto">
+                            <label class="form-label" style="color: #FFC107;">Quantity</label>
+                            <input type="number" name="quantity" value="1" min="1" max="99" class="form-control"
+                                   style="width:100px; background-color: #000000; border: 1px solid #FFC107; color: #FFC107;" />
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn" style="background-color: #FFC107; color: #000000; font-weight: 600; border: none;">
+                                <i class="fa-solid fa-cart-plus me-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="d-flex gap-2">
+                    <!-- Wishlist -->
+                    <form asp-controller="Wishlist" asp-action="Add" method="post" class="d-inline">
+                        <input type="hidden" name="productId" value="@Model.Product.Id" />
+                        <button type="submit" class="btn" style="background-color: transparent; border: 2px solid #FFC107; color: #FFC107; font-weight: 600;">
+                            <i class="fa-regular fa-heart me-2"></i>Add to Wishlist
+                        </button>
+                    </form>
+
+                    <a asp-controller="Product" asp-action="Index" class="btn" style="background-color: transparent; border: 2px solid #FFC107; color: #FFC107; font-weight: 600;">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Back to Products
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="admin-card" style="background-color: #111111; border: 2px solid #FFC107; padding: 20px; border-radius: 8px;">
+                <h3 class="mb-4" style="color: #FFC107; font-weight: 700;">
+                    <i class="fa-solid fa-star me-2"></i>Customer Reviews
+                    @if (Model.Product.ReviewCount > 0)
+                    {
+                        <span class="badge" style="background-color: #FFC107; color: #000000; font-weight: 600;">@Model.Product.ReviewCount</span>
+                    }
+                </h3>
+
+                @if (Model.Product.ReviewCount > 0)
+                {
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-start">
+                            <h1 class="display-3 mb-0" style="color: #FFC107;">@Model.AverageRating.ToString("0.0")</h1>
+                            <div class="star-rating-large mb-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Floor(Model.AverageRating))
+                                    {
+                                        <i class="fa-solid fa-star" style="color: #FFC107;"></i>
+                                    }
+                                    else if (i == Math.Ceiling(Model.AverageRating) && Model.AverageRating % 1 >= 0.5)
+                                    {
+                                        <i class="fa-solid fa-star-half-stroke" style="color: #FFC107;"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-regular fa-star" style="color: #333333;"></i>
+                                    }
+                                }
+                            </div>
+                            <p style="color: #FFC107; margin: 0;">Based on @Model.Product.ReviewCount @(Model.Product.ReviewCount == 1 ? "review" : "reviews")</p>
+                        </div>
+                        <div class="col-md-8">
+                            @for (int star = 5; star >= 1; star--)
+                            {
+                                var count = Model.RatingDistribution.ContainsKey(star) ? Model.RatingDistribution[star] : 0;
+                                var percentage = Model.Product.ReviewCount > 0 ? (count * 100.0 / Model.Product.ReviewCount) : 0;
+
+                                <div class="d-flex align-items-center mb-2">
+                                    <span style="min-width:60px; color: #FFC107;">@star <i class="fa-solid fa-star" style="font-size: 0.8rem;"></i></span>
+                                    <div class="progress flex-grow-1 me-3" style="height:10px; background-color: #333333;">
+                                        <div class="progress-bar" role="progressbar"
+                                             style="width: @percentage%; background-color: #FFC107;"
+                                             aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <span style="min-width:50px; color: #FFC107;">@count</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <hr style="border-color: #FFC107;" />
+                }
+
+                <!-- Write Review -->
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    if (!Model.UserHasReviewed)
+                    {
+                        <div class="mb-4 p-4 rounded" style="background-color: #111111; border: 1px solid #FFC107;">
+                            <h5 class="mb-3" style="color: #FFC107;">
+                                <i class="fa-solid fa-pen-to-square me-2"></i>Write a Review
+                                @if (Model.UserHasOrdered)
+                                {
+                                    <span class="badge" style="background-color: #FFC107; color: #000; font-weight: 600;"><i class="fa-solid fa-check me-1"></i>Verified Purchase</span>
+                                }
+                            </h5>
+
+                            <form asp-controller="Review" asp-action="Add" method="post">
+                                <!-- FIX APPLIED HERE -->
+                                <input type="hidden" name="NewReview.AccessoryId" value="@Model.Product.Id" />
+
+                                <div class="mb-3">
+                                    <label class="form-label" style="color: #FFC107;">Rating *</label>
+                                    <div class="star-rating-input" style="margin-left:500px;">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            var starId = $"star{i}";
+                                            <input type="radio" id="@starId" name="NewReview.Rating" value="@i" required />
+                                            <label for="@starId"><i class="fa-solid fa-star"></i></label>
+                                        }
+                                    </div>
+
+                                    <span asp-validation-for="NewReview.Rating" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="NewReview.Comment" class="form-label" style="color: #FFC107;">Your Review *</label>
+                                    <textarea name="NewReview.Comment" class="form-control" rows="4"
+                                      placeholder="Share your experience with this product..."
+                                      maxlength="1000" required
+                                      style="background-color: #000; border: 1px solid #FFC107; color: #FFC107;"></textarea>
+                                    <span asp-validation-for="NewReview.Comment" class="text-danger"></span>
+                                    <small style="color: #FFC107;">Minimum 10 characters</small>
+                                </div>
+
+                                <button type="submit" class="btn" style="background-color: #FFC107; color: #000; font-weight: 600; border: none;">
+                                    <i class="fa-solid fa-paper-plane me-2"></i>Submit Review
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert" style="background-color: #111111; border: 1px solid #FFC107; color: #FFC107; border-radius: 8px;">
+                            <i class="fa-solid fa-info-circle me-2"></i>
+                            You have already reviewed this product. Thank you for your feedback!
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert" style="background-color: #111111; border: 1px solid #FFC107; color: #FFC107; border-radius: 8px;">
+                        <i class="fa-solid fa-sign-in-alt me-2"></i>
+                        Please <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Product/Details/@Model.Product.Id" style="color: #FFC107; font-weight: 600;">login</a> to write a review.
+                    </div>
+                }
+
+                <!-- Reviews List -->
+                @if (Model.Reviews.Any())
+                {
+                    <h5 class="mb-3 mt-4" style="color: #FFC107; font-weight: 600;">Customer Reviews (@Model.Reviews.Count)</h5>
+
+                    @foreach (var review in Model.Reviews)
+                    {
+                        <div class="review-item mb-3 p-3" style="background-color: #111111; border: 1px solid #FFC107; border-radius: 8px; color: #FFC107;">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <strong class="me-2">@review.ReviewerName ?? "Anonymous"</strong>
+                                        @if (review.IsVerifiedPurchase)
+                                        {
+                                            <span class="badge" style="background-color: #FFC107; color: #000; font-weight: 600;">
+                                                <i class="fa-solid fa-check me-1"></i>Verified Purchase
+                                            </span>
+                                        }
+                                    </div>
+                                    <div class="star-rating-small">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <i class="fa-solid fa-star" style="color: #FFC107; font-size: 0.9rem; margin-right: 2px;"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fa-regular fa-star" style="color: #333333; font-size: 0.9rem; margin-right: 2px;"></i>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                <div style="color: #FFC107; font-size: 0.85rem;">
+                                    @review.CreatedAt.ToString("MMM dd, yyyy")
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(review.Comment))
+                            {
+                                <p style="color: #FFC107; margin: 10px 0 0 0;">@review.Comment</p>
+                            }
+
+                            @if (User.Identity?.IsAuthenticated == true && review.UserId == _userManager.GetUserId(User))
+                            {
+                                <div class="mt-2">
+                                    <form asp-controller="Review" asp-action="Delete" method="post" class="d-inline"
+                                          onsubmit="return confirm('Are you sure you want to delete your review?')">
+                                        <input type="hidden" name="id" value="@review.Id" />
+                                        <input type="hidden" name="productId" value="@Model.Product.Id" />
+                                        <button type="submit" class="btn btn-sm" style="background-color: transparent; border: 1px solid #FFC107; color: #FFC107; font-weight: 600;">
+                                            <i class="fa-solid fa-trash me-1"></i>Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p style="color: #FFC107; text-align: center; padding: 40px 0;">
+                        <i class="fa-regular fa-comment-dots fa-2x mb-2 d-block"></i>
+                        No reviews yet for this product.
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

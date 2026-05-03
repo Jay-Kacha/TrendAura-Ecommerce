@@ -1,0 +1,115 @@
+@model IEnumerable<trendaura.Models.MobileAccessory>
+@{
+    ViewData["Title"] = "Mobile Accessories Management";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa-solid fa-headphones me-2"></i>Mobile Accessories</h2>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="fa-solid fa-plus me-2"></i>Add New Accessory
+    </a>
+</div>
+
+@if (Model.Any())
+{
+    <div class="admin-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Brand</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Color</th>
+                        <th>Featured</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="@item.Name" style="width:60px;height:60px;object-fit:cover;border-radius:4px;" />
+                                }
+                                else
+                                {
+                                    <div style="width:60px;height:60px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:4px;">
+                                        <i class="fa-solid fa-image text-muted"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td><strong>@item.Name</strong></td>
+                            <td>@item.Brand</td>
+                            <td>
+                                @if (item.Category != null)
+                                {
+                                    <span class="badge bg-info">@item.Category.Name</span>
+                                }
+                            </td>
+                            <td><strong class="text-success">Rs @item.Price.ToString("0.00")</strong></td>
+                            <td>
+                                @if (item.Stock > 0)
+                                {
+                                    <span class="badge bg-success">@item.Stock in stock</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Out of Stock</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.Color))
+                                {
+                                    <span class="badge bg-secondary">@item.Color</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsFeatured)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fa-solid fa-star me-1"></i>Featured
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="View Details">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="fa-solid fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" title="Delete">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="admin-card text-center py-5">
+        <i class="fa-solid fa-headphones fa-3x text-muted mb-3"></i>
+        <h4>No Mobile Accessories Found</h4>
+        <p class="text-muted">Start by adding your first mobile accessory</p>
+        <a asp-action="Create" class="btn btn-success mt-3">
+            <i class="fa-solid fa-plus me-2"></i>Add First Accessory
+        </a>
+    </div>
+}

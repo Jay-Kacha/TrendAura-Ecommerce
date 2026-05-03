@@ -1,0 +1,19 @@
+@* Admin sidebar partial *@
+@{
+    var reviewCount = ViewBag.AdminReviewCount as int? ?? 0;
+}
+<ul class="nav flex-column">
+    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index"><i class="fa-solid fa-gauge-high me-2"></i> Dashboard</a></li>
+    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="Index"><i class="fa-solid fa-box-open me-2"></i> Products</a></li>
+    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="MobileAccessories" asp-action="Index"><i class="fa-solid fa-headphones me-2"></i> Mobile Accessories</a></li>
+    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Categories" asp-action="Index"><i class="fa-solid fa-tags me-2"></i> Categories</a></li>
+    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Orders" asp-action="Index"><i class="fa-solid fa-receipt me-2"></i> Orders</a></li>
+    <li class="nav-item d-flex align-items-center justify-content-between">
+        <a class="nav-link" asp-area="Admin" asp-controller="Reviews" asp-action="Index"><i class="fa-solid fa-star me-2"></i> Reviews</a>
+        @if (reviewCount > 0)
+        {
+            <span class="badge" style="background-color:#FFC107; color:#000; margin-right:6px;">@reviewCount</span>
+        }
+    </li>
+    <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Users" asp-action="Index"><i class="fa-solid fa-users me-2"></i> Users</a></li>
+</ul>

@@ -1,0 +1,136 @@
+@model IEnumerable<trendaura.Models.Wishlist>
+@{
+    ViewData["Title"] = "My Wishlist";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4"><i class="fa-regular fa-heart me-2"></i>My Wishlist</h2>
+
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm product-card">
+                        @if (!string.IsNullOrEmpty(item.ItemImageUrl))
+                        {
+                            <img src="@item.ItemImageUrl" class="card-img-top" alt="@item.ItemName" 
+                                 style="height:200px;object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                 style="height:200px;">
+                                <i class="fa-solid fa-image fa-3x text-muted"></i>
+                            </div>
+                        }
+
+                        <div class="card-body">
+                            @if (item.Product != null)
+                            {
+                                <span class="badge bg-primary mb-2">Product</span>
+                            }
+                            else if (item.MobileAccessory != null)
+                            {
+                                <span class="badge bg-info mb-2">Accessory</span>
+                                @if (!string.IsNullOrEmpty(item.MobileAccessory.Brand))
+                                {
+                                    <span class="badge bg-secondary mb-2">@item.MobileAccessory.Brand</span>
+                                }
+                            }
+
+                            <h5 class="card-title">@item.ItemName</h5>
+
+                            <div class="mb-3">
+                                <h4 class="text-success mb-0">Rs @item.ItemPrice.ToString("0.00")</h4>
+                            </div>
+
+                            @if (item.ItemStock > 0)
+                            {
+                                <span class="badge bg-success mb-2">In Stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger mb-2">Out of Stock</span>
+                            }
+
+                            <div class="d-grid gap-2 mt-3">
+                                @if (item.ItemStock > 0)
+                                {
+                                    <form asp-action="MoveToCart" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="fa-solid fa-shopping-cart me-1"></i>Move to Cart
+                                        </button>
+                                    </form>
+                                }
+
+                                @if (item.Product != null)
+                                {
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fa-solid fa-eye me-1"></i>View Details
+                                    </a>
+                                }
+                                else if (item.MobileAccessory != null)
+                                {
+                                    <a asp-controller="Accessories" asp-action="Details" asp-route-id="@item.MobileAccessoryId" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fa-solid fa-eye me-1"></i>View Details
+                                    </a>
+                                }
+
+                                <form asp-action="Remove" method="post" onsubmit="return confirm('Remove from wishlist?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                                        <i class="fa-solid fa-trash me-1"></i>Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4 text-center">
+            <form asp-action="Clear" method="post" class="d-inline" onsubmit="return confirm('Clear entire wishlist?');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-danger">
+                    <i class="fa-solid fa-trash-can me-2"></i>Clear Wishlist
+                </button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="admin-card text-center py-5">
+            <i class="fa-regular fa-heart fa-4x text-muted mb-3"></i>
+            <h4>Your Wishlist is Empty</h4>
+            <p class="text-muted mb-4">Save items you love to your wishlist!</p>
+            <div class="d-flex gap-2 justify-content-center">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-primary">
+                    <i class="fa-solid fa-shopping-bag me-2"></i>Browse Products
+                </a>
+                <a asp-controller="Accessories" asp-action="Index" class="btn btn-outline-primary">
+                    <i class="fa-solid fa-headphones me-2"></i>Browse Accessories
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <style>
+        .product-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+    </style>
+}

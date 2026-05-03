@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="admin-card text-center py-5">
+                <i class="fa-solid fa-lock fa-4x text-danger mb-4"></i>
+                <h2 class="mb-3">Access Denied</h2>
+                <p class="text-muted mb-4">You do not have permission to access this page.</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                        <i class="fa-solid fa-home me-2"></i>Go to Home
+                    </a>
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

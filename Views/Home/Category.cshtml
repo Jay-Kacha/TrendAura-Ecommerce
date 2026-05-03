@@ -1,0 +1,52 @@
+@model IEnumerable<trendaura.Models.Product>
+@{
+    ViewData["Title"] = "Category Products";
+    var categoryName = Model.FirstOrDefault()?.Category?.Name ?? "Products";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4">@categoryName</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="admin-card text-center py-5">
+            <i class="fa-solid fa-box-open fa-3x text-muted mb-3"></i>
+            <h4>No products found in this category</h4>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">
+                <i class="fa-solid fa-home me-2"></i>Back to Home
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var p in Model)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="product-card h-100">
+                        <div class="img-wrap">
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder.png" : p.ImageUrl)" 
+                                 alt="@p.Name" class="card-img-top" />
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title mb-1">@p.Name</h6>
+                            <p class="card-text text-muted small mb-2">@p.Category?.Name</p>
+                            <div class="price mb-3">Rs @p.Price.ToString("0.00")</div>
+                            
+                            <div class="d-flex gap-2">
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary flex-grow-1">View</a>
+                                <form asp-controller="Cart" asp-action="Add" method="post" class="mb-0 flex-grow-1">
+                                    <input type="hidden" name="productId" value="@p.Id" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <button type="submit" class="btn btn-sm btn-primary w-100">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

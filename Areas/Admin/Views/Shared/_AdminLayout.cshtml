@@ -1,0 +1,281 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* Admin Panel Black & Yellow Theme */
+        body {
+            background-color: #000000 !important;
+            color: #cccccc !important;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 240px;
+            background: #111111 !important;
+            color: #cccccc !important;
+            min-height: 100vh;
+            border-right: 2px solid #FFC107 !important;
+        }
+
+            .admin-sidebar h4 {
+                color: #FFC107 !important;
+                font-weight: 700;
+            }
+
+            .admin-sidebar .nav-link {
+                color: #cccccc !important;
+                transition: all 0.3s ease;
+                border-radius: 6px;
+                margin-bottom: 4px;
+                border-left: 3px solid transparent;
+            }
+
+                .admin-sidebar .nav-link:hover {
+                    background: rgba(255, 193, 7, 0.1) !important;
+                    color: #FFC107 !important;
+                    border-left-color: #FFC107 !important;
+                }
+
+                .admin-sidebar .nav-link.active {
+                    background: rgba(255, 193, 7, 0.2) !important;
+                    font-weight: 600;
+                    color: #FFC107 !important;
+                    border-left-color: #FFC107 !important;
+                }
+
+            .admin-sidebar hr {
+                border-color: rgba(255, 193, 7, 0.3) !important;
+            }
+
+        /* Main Content Area */
+        .flex-grow-1 {
+            background-color: #000000 !important;
+            color: #cccccc !important;
+        }
+
+        /* Admin Top Header */
+        .admin-top {
+            background: #111111 !important;
+            border: 1px solid #FFC107 !important;
+            border-radius: 8px;
+            padding: 12px 18px;
+            color: #cccccc;
+        }
+
+            .admin-top h4 {
+                color: #FFC107 !important;
+                font-weight: 700;
+            }
+
+        /* Badges */
+        .badge {
+            background-color: #FFC107 !important;
+            color: #000000 !important;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn-outline-secondary {
+            background-color: transparent !important;
+            border: 2px solid #FFC107 !important;
+            color: #FFC107 !important;
+        }
+
+            .btn-outline-secondary:hover {
+                background-color: #FFC107 !important;
+                color: #000000 !important;
+            }
+
+        /* Alerts */
+        .alert-success {
+            background: linear-gradient(90deg, #FFC107, #ffb300) !important;
+            color: #000000 !important;
+            border: none !important;
+        }
+
+        .alert-danger {
+            background: linear-gradient(90deg, #ff6b6b, #ff5252) !important;
+            color: #ffffff !important;
+            border: none !important;
+        }
+
+        /* Close buttons */
+        .btn-close {
+            filter: invert(1) !important;
+            opacity: 0.8;
+        }
+
+            .btn-close:hover {
+                opacity: 1;
+            }
+
+        /* ==========================================
+                   100% WORKING TABLE HOVER FIX FOR ADMIN
+                   ========================================== */
+        .table {
+            --bs-table-hover-color: #ffffff !important;
+            --bs-table-hover-bg: rgba(255, 193, 7, 0.1) !important;
+        }
+
+            .table tbody tr:hover td,
+            .table tbody tr:hover th,
+            .table-hover > tbody > tr:hover > * {
+                color: #ffffff !important;
+                box-shadow: inset 0 0 0 9999px var(--bs-table-hover-bg) !important;
+            }
+
+               
+                .table tbody tr:hover td a:not(.btn),
+                .table tbody tr:hover td span:not(.badge),
+                .table tbody tr:hover td strong,
+                .table tbody tr:hover td div,
+                .table tbody tr:hover td p {
+                    color: #ffffff !important;
+                }
+
+                .table tbody tr:hover td .text-muted {
+                    color: #cccccc !important;
+                }
+
+            /* ==========================================
+                   BUTTON TEXT COLOR FIX 
+                   ========================================== */
+          
+            .table td .btn:not(.btn-danger):not(.btn-outline-danger),
+            .table td a.btn:not(.btn-danger):not(.btn-outline-danger) {
+                color: #000000 !important;
+                font-weight: 600 !important;
+            }
+
+          
+            .table tbody tr:hover td .btn:not(.btn-danger):not(.btn-outline-danger),
+            .table tbody tr:hover td a.btn:not(.btn-danger):not(.btn-outline-danger) {
+                color: #000000 !important;
+            }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .admin-sidebar {
+                width: 100%;
+                min-height: auto;
+                border-right: none !important;
+                border-bottom: 2px solid #FFC107 !important;
+            }
+
+            .d-flex {
+                flex-direction: column;
+            }
+
+            .flex-grow-1 {
+                padding: 15px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    @{
+        // Try to set review count for sidebar badge.
+        try
+        {
+            var db = Context.RequestServices.GetService(typeof(trendaura.Data.ApplicationDbContext)) as trendaura.Data.ApplicationDbContext;
+            if (db != null)
+            {
+                ViewBag.AdminReviewCount = db.Reviews.Count();
+            }
+            else
+            {
+                ViewBag.AdminReviewCount = 0;
+            }
+        }
+        catch
+        {
+            ViewBag.AdminReviewCount = 0;
+        }
+    }
+
+    <div class="d-flex">
+        <aside class="admin-sidebar p-3">
+            <div class="mb-4">
+                <h4>Admin Panel</h4>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <small style="color: #cccccc;">@User.Identity.Name</small>
+                }
+            </div>
+
+            <nav class="nav flex-column">
+                <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index"><i class="fa-solid fa-gauge-high me-2" style="color: #FFC107;"></i>Dashboard</a>
+                <a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="Index"><i class="fa-solid fa-box-open me-2" style="color: #FFC107;"></i>Products</a>
+                <a class="nav-link" asp-area="Admin" asp-controller="Categories" asp-action="Index"><i class="fa-solid fa-tags me-2" style="color: #FFC107;"></i>Categories</a>
+                <a class="nav-link" asp-area="Admin" asp-controller="Orders" asp-action="Index"><i class="fa-solid fa-receipt me-2" style="color: #FFC107;"></i>Orders</a>
+                <a class="nav-link" asp-area="Admin" asp-controller="Users" asp-action="Index"><i class="fa-solid fa-users me-2" style="color: #FFC107;"></i>Users</a>
+                <a class="nav-link" asp-area="Admin" asp-controller="Reviews" asp-action="Index">
+                    <i class="fa-solid fa-star me-2" style="color: #FFC107;"></i>Reviews
+                    @if (ViewBag.AdminReviewCount > 0)
+                    {
+                        <span class="badge rounded-pill bg-warning text-dark ms-2">@ViewBag.AdminReviewCount</span>
+                    }
+                </a>
+                <hr />
+                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fa-solid fa-store me-2" style="color: #FFC107;"></i>View Store
+                </a>
+                <form asp-area="Admin" asp-controller="Auth" asp-action="Logout" method="post" class="mt-2">
+                    <button type="submit" class="nav-link border-0 bg-transparent text-start w-100">
+                        <i class="fa-solid fa-sign-out-alt me-2" style="color: #FFC107;"></i>Logout
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <div class="flex-grow-1 p-4">
+            <header class="admin-top mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">@ViewData["Title"]</h4>
+                    <div>
+                        <span class="badge me-2">
+                            <i class="fa-solid fa-shield-halved me-1"></i>Admin
+                        </span>
+                        <a class="btn btn-sm btn-outline-secondary" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="fa-solid fa-home me-1"></i> View Site
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            @if (TempData["success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fa-solid fa-check-circle me-2"></i>@TempData["success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fa-solid fa-exclamation-circle me-2"></i>@TempData["error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/admin.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

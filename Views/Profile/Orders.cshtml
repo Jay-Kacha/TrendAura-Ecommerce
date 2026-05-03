@@ -1,0 +1,167 @@
+@model IEnumerable<trendaura.Models.Order>
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="admin-card">
+                <div class="text-center py-3">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-user-circle fa-4x text-primary"></i>
+                    </div>
+                    <h5>@User.Identity?.Name</h5>
+                    <p class="text-muted small">Customer</p>
+                </div>
+                <hr>
+                <nav class="nav flex-column">
+                    <a asp-controller="Profile" asp-action="Index" class="nav-link">
+                        <i class="fa-solid fa-user me-2"></i>Profile
+                    </a>
+                    <a asp-controller="Profile" asp-action="Orders" class="nav-link active">
+                        <i class="fa-solid fa-receipt me-2"></i>My Orders
+                    </a>
+                    <a asp-controller="Profile" asp-action="ChangePassword" class="nav-link">
+                        <i class="fa-solid fa-key me-2"></i>Change Password
+                    </a>
+                    <a asp-controller="Wishlist" asp-action="Index" class="nav-link">
+                        <i class="fa-regular fa-heart me-2"></i>Wishlist
+                    </a>
+                    <hr>
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        <button type="submit" class="nav-link text-danger border-0 bg-transparent w-100 text-start">
+                            <i class="fa-solid fa-sign-out-alt me-2"></i>Logout
+                        </button>
+                    </form>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="admin-card">
+                <h3 class="mb-4"><i class="fa-solid fa-receipt me-2"></i>My Orders</h3>
+
+                @if (!Model.Any())
+                {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-receipt fa-3x text-muted mb-3"></i>
+                        <h4>No orders yet</h4>
+                        <p class="text-muted">Start shopping to see your orders here!</p>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">
+                            <i class="fa-solid fa-store me-2"></i>Start Shopping
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model)
+                                {
+                                    <tr>
+                                        <td><strong>#@order.Id</strong></td>
+                                        <td>@order.OrderDate.ToLocalTime().ToString("MMM dd, yyyy")</td>
+                                        <td>@order.Items?.Count items</td>
+                                        <td><strong>Rs @order.TotalAmount.ToString("0.00")</strong></td>
+                                        <td>
+                                            <span class="badge bg-@(order.Status == "Delivered" ? "success" : order.Status == "Cancelled" ? "danger" : "warning")">
+                                                @order.Status
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#orderModal@order.Id">
+                                                <i class="fa-solid fa-eye me-1"></i>View Details
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Order Details Modal -->
+                                    <div class="modal fade" id="orderModal@order.Id" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Order #@order.Id Details</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <p><strong>Order Date:</strong> @order.OrderDate.ToLocalTime().ToString("MMMM dd, yyyy hh:mm tt")</p>
+                                                            <p><strong>Status:</strong> <span class="badge bg-@(order.Status == "Delivered" ? "success" : order.Status == "Cancelled" ? "danger" : "warning")">@order.Status</span></p>
+                                                            <p><strong>Payment Method:</strong> @order.PaymentMethod</p>
+                                                            <p><strong>Payment Status:</strong> 
+                                                                <span class="badge bg-@(order.PaymentStatus == "Paid" ? "success" : "warning")">
+                                                                    @order.PaymentStatus
+                                                                </span>
+                                                            </p>
+                                                            @if (!string.IsNullOrEmpty(order.TransactionId))
+                                                            {
+                                                                <p><strong>Transaction ID:</strong><br/>
+                                                                <small class="text-muted">@order.TransactionId</small></p>
+                                                            }
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p><strong>Total:</strong> <span class="h5 text-primary">Rs @order.TotalAmount.ToString("0.00")</span></p>
+                                                            @if (!string.IsNullOrEmpty(order.ShippingAddress))
+                                                            {
+                                                                <p><strong>Shipping To:</strong><br/>
+                                                                <small class="text-muted">@order.ShippingAddress</small></p>
+                                                            }
+                                                        </div>
+                                                    </div>
+
+                                                    <h6 class="mb-3">Order Items</h6>
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Product</th>
+                                                                <th>Quantity</th>
+                                                                <th>Price</th>
+                                                                <th>Subtotal</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @if (order.Items != null)
+                                                            {
+                                                                @foreach (var item in order.Items)
+                                                                {
+                                                                    <tr>
+                                                                        <td>@item.Product?.Name</td>
+                                                                        <td>@item.Quantity</td>
+                                                                        <td>Rs @item.UnitPrice.ToString("0.00")</td>
+                                                                        <td><strong>Rs @((item.Quantity * item.UnitPrice).ToString("0.00"))</strong></td>
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

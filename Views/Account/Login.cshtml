@@ -1,0 +1,122 @@
+@model trendaura.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    body {
+        background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.85)), url('/images/mobile-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+    }
+
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .glass-card {
+        width: 100%;
+        max-width: 420px;
+        padding: 40px;
+        border-radius: 15px;
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.15);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        color: white;
+    }
+
+        .glass-card h3 {
+            font-weight: 600;
+        }
+
+    .form-control {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+    }
+
+        .form-control::placeholder {
+            color: #ccc;
+        }
+
+        .form-control:focus {
+            background: rgba(255,255,255,0.15);
+            border-color: #FFC107;
+            box-shadow: none;
+            color: white;
+        }
+
+    .btn-login {
+        background: #FFC107;
+        border: none;
+        color: black;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+        .btn-login:hover {
+            background: #ffca2c;
+            transform: translateY(-2px);
+        }
+
+    a {
+        color: #FFC107;
+        text-decoration: none;
+    }
+
+        a:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="login-wrapper">
+    <div class="glass-card">
+
+        <div class="text-center mb-4">
+            <h3>Welcome Back</h3>
+            <p class="text-light">Sign in to your account</p>
+        </div>
+
+        <form asp-controller="Account" asp-action="Login" method="post">
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label">Remember me</label>
+            </div>
+
+            <button type="submit" class="btn btn-login w-100 mb-3">
+                Login
+            </button>
+
+            <div class="text-center">
+                <p class="mb-0">
+                    Don't have an account?
+                    <a asp-controller="Account" asp-action="Register">Register here</a>
+                </p>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

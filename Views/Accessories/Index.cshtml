@@ -1,0 +1,217 @@
+@model IEnumerable<trendaura.Models.MobileAccessory>
+@{
+    ViewData["Title"] = "Mobile Accessories";
+}
+
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="mb-3"><i class="fa-solid fa-headphones me-2"></i>Mobile Accessories</h2>
+            <p class="text-muted">Browse our wide range of mobile accessories</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="admin-card">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small">Search</label>
+                        <input type="text" name="searchTerm" value="@ViewBag.SearchTerm" class="form-control" placeholder="Search accessories..." />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Category</label>
+                        <select name="categoryId" class="form-select">
+                            <option value="">All Categories</option>
+                            @foreach (var category in ViewBag.Categories)
+                            {
+                                <option value="@category.Id" selected="@(ViewBag.CurrentCategory == category.Id)">@category.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Brand</label>
+                        <select name="brand" class="form-select">
+                            <option value="">All Brands</option>
+                            @foreach (var brand in ViewBag.Brands)
+                            {
+                                <option value="@brand" selected="@(ViewBag.CurrentBrand == brand)">@brand</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Sort By</label>
+                        <select name="sortBy" class="form-select">
+                            <option value="">Latest</option>
+                            <option value="name" selected="@(ViewBag.SortBy == "name")">Name</option>
+                            <option value="price_asc" selected="@(ViewBag.SortBy == "price_asc")">Price: Low to High</option>
+                            <option value="price_desc" selected="@(ViewBag.SortBy == "price_desc")">Price: High to Low</option>
+                            <option value="rating" selected="@(ViewBag.SortBy == "rating")">Rating</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fa-solid fa-filter"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                            <i class="fa-solid fa-redo me-1"></i>Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accessories Grid -->
+    @if (Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var accessory in Model)
+            {
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm product-card">
+                        @if (!string.IsNullOrEmpty(accessory.ImageUrl))
+                        {
+                            <img src="@accessory.ImageUrl" class="card-img-top" alt="@accessory.Name" style="height:200px;object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+                                <i class="fa-solid fa-image fa-3x text-muted"></i>
+                            </div>
+                        }
+                        
+                        @if (accessory.IsFeatured)
+                        {
+                            <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">
+                                <i class="fa-solid fa-star me-1"></i>Featured
+                            </span>
+                        }
+
+                        @if (accessory.Stock == 0)
+                        {
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2">
+                                Out of Stock
+                            </span>
+                        }
+
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">@accessory.Brand</span>
+                            @if (accessory.Category != null)
+                            {
+                                <span class="badge bg-secondary mb-2">@accessory.Category.Name</span>
+                            }
+                            
+                            <h5 class="card-title">@accessory.Name</h5>
+                            
+                            <!-- Rating Display -->
+                            @if (accessory.ReviewCount > 0)
+                            {
+                                <div class="mb-2">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= Math.Floor(accessory.AverageRating))
+                                        {
+                                            <i class="fa-solid fa-star text-warning"></i>
+                                        }
+                                        else if (i == Math.Ceiling(accessory.AverageRating) && accessory.AverageRating % 1 != 0)
+                                        {
+                                            <i class="fa-solid fa-star-half-stroke text-warning"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fa-regular fa-star text-warning"></i>
+                                        }
+                                    }
+                                    <small class="text-muted ms-1">(@accessory.ReviewCount)</small>
+                                </div>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(accessory.Color))
+                            {
+                                <p class="card-text small text-muted mb-1">
+                                    <i class="fa-solid fa-palette me-1"></i>@accessory.Color
+                                </p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(accessory.Compatibility))
+                            {
+                                <p class="card-text small text-muted mb-2">
+                                    <i class="fa-solid fa-mobile-alt me-1"></i>@accessory.Compatibility
+                                </p>
+                            }
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <h4 class="text-success mb-0">Rs @accessory.Price.ToString("0.00")</h4>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-3">
+                                <a asp-action="Details" asp-route-id="@accessory.Id" class="btn btn-primary btn-sm">
+                                    <i class="fa-solid fa-eye me-1"></i>View Details
+                                </a>
+
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    @if (accessory.Stock > 0)
+                                    {
+                                        <form asp-controller="Cart" asp-action="AddAccessory" method="post">
+                                            <input type="hidden" name="accessoryId" value="@accessory.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-success btn-sm w-100">
+                                                <i class="fa-solid fa-shopping-cart me-1"></i>Add to Cart
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-secondary btn-sm w-100" disabled>
+                                            <i class="fa-solid fa-ban me-1"></i>Out of Stock
+                                        </button>
+                                    }
+
+                                    <form asp-controller="Wishlist" asp-action="AddAccessory" method="post">
+                                        <input type="hidden" name="accessoryId" value="@accessory.Id" />
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                                            <i class="fa-regular fa-heart me-1"></i>Wishlist
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-sm">
+                                        <i class="fa-solid fa-sign-in-alt me-1"></i>Login to Purchase
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="admin-card text-center py-5">
+            <i class="fa-solid fa-headphones fa-3x text-muted mb-3"></i>
+            <h4>No Accessories Found</h4>
+            <p class="text-muted">Try adjusting your filters or check back later</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <style>
+        .product-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+    </style>
+}

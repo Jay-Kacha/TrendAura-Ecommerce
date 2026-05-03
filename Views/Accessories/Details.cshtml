@@ -1,0 +1,330 @@
+@model trendaura.Models.MobileAccessory
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Accessories" asp-action="Index">Accessories</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-6">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded shadow" style="width:100%;max-height:500px;object-fit:contain;" />
+            }
+            else
+            {
+                <div class="text-center p-5 bg-light rounded shadow">
+                    <i class="fa-solid fa-image fa-5x text-muted"></i>
+                    <p class="mt-3 text-muted">No image available</p>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-6">
+            <div class="admin-card">
+                <h2 class="mb-3">@Model.Name</h2>
+
+                <div class="mb-3">
+                    <span class="badge bg-info me-2">@Model.Brand</span>
+                    @if (Model.Category != null)
+                    {
+                        <span class="badge bg-secondary me-2">@Model.Category.Name</span>
+                    }
+                    @if (Model.IsFeatured)
+                    {
+                        <span class="badge bg-warning text-dark">
+                            <i class="fa-solid fa-star me-1"></i>Featured
+                        </span>
+                    }
+                </div>
+
+                <!-- Rating Display -->
+                <div class="mb-3">
+                    @if (Model.ReviewCount > 0)
+                    {
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Floor(Model.AverageRating))
+                                    {
+                                        <i class="fa-solid fa-star text-warning"></i>
+                                    }
+                                    else if (i == Math.Ceiling(Model.AverageRating) && Model.AverageRating % 1 != 0)
+                                    {
+                                        <i class="fa-solid fa-star-half-stroke text-warning"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-regular fa-star text-warning"></i>
+                                    }
+                                }
+                            </div>
+                            <span class="text-muted">
+                                @Model.AverageRating.ToString("0.0") out of 5 (@Model.ReviewCount @(Model.ReviewCount == 1 ? "review" : "reviews"))
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            <i class="fa-regular fa-star text-warning"></i>
+                            <span class="ms-2">No reviews yet</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="text-success">Rs @Model.Price.ToString("0.00")</h3>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <h6 class="text-muted mb-1">Availability</h6>
+                        @if (Model.Stock > 0)
+                        {
+                            <span class="badge bg-success">In Stock (@Model.Stock available)</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Out of Stock</span>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Color))
+                    {
+                        <div class="col-6">
+                            <h6 class="text-muted mb-1">Color</h6>
+                            <p class="mb-0">
+                                <i class="fa-solid fa-palette me-1"></i>@Model.Color
+                            </p>
+                        </div>
+                    }
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Compatibility))
+                {
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-1">Compatible With</h6>
+                        <p class="mb-0">
+                            <i class="fa-solid fa-mobile-alt me-1"></i>@Model.Compatibility
+                        </p>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-1">Description</h6>
+                        <p class="mb-0">@Model.Description</p>
+                    </div>
+                }
+
+                <div class="d-grid gap-2">
+                    @if (Model.Stock > 0)
+                    {
+                        <form asp-controller="Cart" asp-action="AddAccessory" method="post">
+                            <input type="hidden" name="accessoryId" value="@Model.Id" />
+                            <input type="hidden" name="quantity" value="1" />
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success btn-lg w-100">
+                                <i class="fa-solid fa-shopping-cart me-2"></i>Add to Cart
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary btn-lg w-100" disabled>
+                            <i class="fa-solid fa-ban me-2"></i>Out of Stock
+                        </button>
+                    }
+                    
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <form asp-controller="Wishlist" asp-action="AddAccessory" method="post">
+                            <input type="hidden" name="accessoryId" value="@Model.Id" />
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="fa-regular fa-heart me-2"></i>Add to Wishlist
+                            </button>
+                        </form>
+                    }
+                    
+                    <a asp-controller="Accessories" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Back to Accessories
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="admin-card">
+                <h4 class="mb-3"><i class="fa-solid fa-info-circle me-2"></i>Product Information</h4>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6 class="text-muted">Brand</h6>
+                        <p>@Model.Brand</p>
+                    </div>
+                    @if (Model.Category != null)
+                    {
+                        <div class="col-md-3">
+                            <h6 class="text-muted">Category</h6>
+                            <p>@Model.Category.Name</p>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Color))
+                    {
+                        <div class="col-md-3">
+                            <h6 class="text-muted">Color</h6>
+                            <p>@Model.Color</p>
+                        </div>
+                    }
+                    <div class="col-md-3">
+                        <h6 class="text-muted">Stock Status</h6>
+                        <p>@Model.Stock units available</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="admin-card">
+                <h4 class="mb-4"><i class="fa-solid fa-star me-2"></i>Customer Reviews</h4>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <!-- Add Review Form -->
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <h5 class="mb-3">Write a Review</h5>
+                        <form asp-controller="AccessoryReview" asp-action="Add" method="post">
+                            <input type="hidden" name="accessoryId" value="@Model.Id" />
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Rating</label>
+                                <div class="rating-input">
+                                    <input type="radio" name="rating" value="5" id="star5" required />
+                                    <label for="star5" title="5 stars">?</label>
+                                    <input type="radio" name="rating" value="4" id="star4" />
+                                    <label for="star4" title="4 stars">?</label>
+                                    <input type="radio" name="rating" value="3" id="star3" />
+                                    <label for="star3" title="3 stars">?</label>
+                                    <input type="radio" name="rating" value="2" id="star2" />
+                                    <label for="star2" title="2 stars">?</label>
+                                    <input type="radio" name="rating" value="1" id="star1" />
+                                    <label for="star1" title="1 star">?</label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="comment" class="form-label">Your Review</label>
+                                <textarea name="comment" id="comment" class="form-control" rows="4" 
+                                          placeholder="Share your experience with this accessory..." maxlength="1000"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-paper-plane me-2"></i>Submit Review
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="fa-solid fa-info-circle me-2"></i>
+                        Please <a asp-controller="Account" asp-action="Login" class="alert-link">login</a> to write a review.
+                    </div>
+                }
+
+                <!-- Reviews List -->
+                <div id="reviews-container">
+                    @if (Model.Reviews != null && Model.Reviews.Any())
+                    {
+                        <hr />
+                        <div class="mt-4">
+                            @foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedAt))
+                            {
+                                <div class="review-item mb-4 p-3 border rounded">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <strong>@review.ReviewerName</strong>
+                                            @if (review.IsVerifiedPurchase)
+                                            {
+                                                <span class="badge bg-success ms-2">
+                                                    <i class="fa-solid fa-check"></i> Verified Purchase
+                                                </span>
+                                            }
+                                        </div>
+                                        <small class="text-muted">@review.CreatedAt.ToString("MMM dd, yyyy")</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <i class="fa-solid fa-star text-warning"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fa-regular fa-star text-warning"></i>
+                                            }
+                                        }
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(review.Comment))
+                                    {
+                                        <p class="mb-0">@review.Comment</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="fa-regular fa-comment fa-3x mb-3"></i>
+                            <p>No reviews yet. Be the first to review this accessory!</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .rating-input {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+        .rating-input input {
+            display: none;
+        }
+        .rating-input label {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .rating-input input:checked ~ label,
+        .rating-input label:hover,
+        .rating-input label:hover ~ label {
+            color: #ffc107;
+        }
+    </style>
+}

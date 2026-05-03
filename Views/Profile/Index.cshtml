@@ -1,0 +1,141 @@
+@model trendaura.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="admin-card">
+                <div class="text-center py-3">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-user-circle fa-4x text-primary"></i>
+                    </div>
+                    <h5>@User.Identity?.Name</h5>
+                    <p class="text-muted small">Customer</p>
+                </div>
+                <hr>
+                <nav class="nav flex-column">
+                    <a asp-controller="Profile" asp-action="Index" class="nav-link active">
+                        <i class="fa-solid fa-user me-2"></i>Profile
+                    </a>
+                    <a asp-controller="Profile" asp-action="Orders" class="nav-link">
+                        <i class="fa-solid fa-receipt me-2"></i>My Orders
+                    </a>
+                    <a asp-controller="Profile" asp-action="ChangePassword" class="nav-link">
+                        <i class="fa-solid fa-key me-2"></i>Change Password
+                    </a>
+                    <a asp-controller="Wishlist" asp-action="Index" class="nav-link">
+                        <i class="fa-regular fa-heart me-2"></i>Wishlist
+                    </a>
+                    <hr>
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        <button type="submit" class="nav-link text-danger border-0 bg-transparent w-100 text-start">
+                            <i class="fa-solid fa-sign-out-alt me-2"></i>Logout
+                        </button>
+                    </form>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="admin-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3><i class="fa-solid fa-user-edit me-2"></i>Edit Profile</h3>
+                </div>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        <h6>Please correct the following errors:</h6>
+                        <ul class="mb-0">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <form asp-controller="Profile" asp-action="Index" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FullName" class="form-label">Full Name *</label>
+                            <input asp-for="FullName" class="form-control" placeholder="John Doe" required />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Email" class="form-label">Email *</label>
+                            <input asp-for="Email" class="form-control" placeholder="john@example.com" required />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="+1 (555) 123-4567" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <hr class="my-4">
+                    <h5 class="mb-3">Address Information</h5>
+
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label">Street Address</label>
+                        <input asp-for="Address" class="form-control" placeholder="123 Main Street, Apt 4" />
+                        <span asp-validation-for="Address" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="City" class="form-label">City</label>
+                            <input asp-for="City" class="form-control" placeholder="New York" />
+                            <span asp-validation-for="City" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="State" class="form-label">State / Province</label>
+                            <input asp-for="State" class="form-control" placeholder="NY" />
+                            <span asp-validation-for="State" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ZipCode" class="form-label">Zip / Postal Code</label>
+                            <input asp-for="ZipCode" class="form-control" placeholder="10001" />
+                            <span asp-validation-for="ZipCode" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Country" class="form-label">Country</label>
+                            <input asp-for="Country" class="form-control" placeholder="United States" />
+                            <span asp-validation-for="Country" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fa-solid fa-info-circle me-2"></i>
+                        <strong>Note:</strong> Fields marked with * are required.
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-save me-2"></i>Save Changes
+                        </button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

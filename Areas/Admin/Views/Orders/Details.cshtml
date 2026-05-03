@@ -1,0 +1,148 @@
+@model trendaura.Models.Order
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="mb-3">
+    <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="btn btn-sm btn-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Orders
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="admin-card mb-4">
+            <h3>Order #@Model.Id</h3>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <h6>Customer Information</h6>
+                    <p class="mb-1"><strong>Name:</strong> @(Model.User?.FullName ?? "N/A")</p>
+                    <p class="mb-1"><strong>Email:</strong> @(Model.User?.Email ?? Model.UserId)</p>
+                    <p class="mb-1"><strong>Phone:</strong> @(Model.User?.PhoneNumber ?? "N/A")</p>
+                    @if (!string.IsNullOrEmpty(Model.User?.Address))
+                    {
+                        <hr class="my-2 border-warning opacity-25" />
+                        <h6 class="mt-3">Shipping Address</h6>
+                        <p class="mb-1">@Model.User.Address</p>
+                        <p class="mb-1">@Model.User.City, @Model.User.State @Model.User.ZipCode</p>
+                        <p class="mb-1">@Model.User.Country</p>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <h6>Order Information</h6>
+                    <p class="mb-1"><strong>Order Date:</strong> @Model.OrderDate.ToLocalTime().ToString("MMMM dd, yyyy hh:mm tt")</p>
+                    <p class="mb-1"><strong>Total Amount:</strong> <span class="h5 text-warning">Rs @Model.TotalAmount.ToString("0.00")</span></p>
+                    <p class="mb-1"><strong>Status:</strong> <span class="badge bg-@(Model.Status == "Delivered" ? "success" : Model.Status == "Cancelled" ? "danger" : "warning") text-dark">@Model.Status</span></p>
+                    <p class="mb-1"><strong>Payment Method:</strong> @Model.PaymentMethod</p>
+                    <p class="mb-1">
+                        <strong>Payment Status:</strong>
+                        <span class="badge bg-@(Model.PaymentStatus == "Paid" ? "success" : "warning") text-dark">
+                            @Model.PaymentStatus
+                        </span>
+                    </p>
+                    @if (!string.IsNullOrEmpty(Model.TransactionId))
+                    {
+                        <p class="mb-1 mt-2">
+                            <strong>Transaction ID:</strong><br />
+                            <small class="text-muted">@Model.TransactionId</small>
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <h5 class="mb-3">Order Items</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        @if (!string.IsNullOrEmpty(i.Product?.ImageUrl))
+                                        {
+                                            <img src="@i.Product.ImageUrl" alt="@i.Product.Name"
+                                                 style="width:50px;height:50px;object-fit:cover;border-radius:4px;" class="me-3 border border-warning" />
+                                        }
+                                        <strong>@i.Product?.Name</strong>
+                                    </div>
+                                </td>
+                                <td>@i.Quantity</td>
+                                <td>Rs @i.UnitPrice.ToString("0.00")</td>
+                                <td><strong class="text-warning">Rs @((i.Quantity * i.UnitPrice).ToString("0.00"))</strong></td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end border-top border-warning"><strong>Total:</strong></td>
+                            <td class="border-top border-warning"><strong class="text-warning fs-5">Rs @Model.TotalAmount.ToString("0.00")</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Order Status Admin Card -->
+        <div class="admin-card mb-4">
+            <h5 class="mb-3 text-warning"><i class="fa-solid fa-box me-2"></i>Update Order</h5>
+            <form asp-area="Admin" asp-controller="Orders" asp-action="UpdateStatus" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="mb-3">
+                    <label class="form-label">Order Status</label>
+                    <select name="status" class="form-select bg-dark text-white border-warning">
+                      
+                        <option value="Pending" selected="@(Model.Status == "Pending")">Pending</option>
+                        <option value="Confirmed" selected="@(Model.Status == "Confirmed")">Confirmed</option>
+                        <option value="Processing" selected="@(Model.Status == "Processing")">Processing</option>
+                        <option value="Shipped" selected="@(Model.Status == "Shipped")">Shipped</option>
+                        <option value="Delivered" selected="@(Model.Status == "Delivered")">Delivered</option>
+                        <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Cancelled</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-warning w-100 fw-bold">
+                    <i class="fa-solid fa-sync me-2"></i>Set Order Status
+                </button>
+            </form>
+        </div>
+
+        <!-- Payment Status Admin Card -->
+        <div class="admin-card mb-4">
+            <h5 class="mb-3 text-warning"><i class="fa-solid fa-wallet me-2"></i>Update Payment</h5>
+            <form asp-area="Admin" asp-controller="Orders" asp-action="UpdatePaymentStatus" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="mb-3">
+                    <label class="form-label">Payment Status</label>
+                    <select name="paymentStatus" class="form-select bg-dark text-white border-warning">
+                        <option value="Pending" selected="@(Model.PaymentStatus == "Pending")">Pending</option>
+                        <option value="Paid" selected="@(Model.PaymentStatus == "Paid")">Paid (Confirmed)</option>
+                        <option value="Failed" selected="@(Model.PaymentStatus == "Failed")">Failed</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-warning w-100 fw-bold">
+                    <i class="fa-solid fa-credit-card me-2"></i>Set Payment Status
+                </button>
+            </form>
+        </div>
+
+        <div class="d-grid mt-2">
+            <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-list me-2"></i>View All Orders
+            </a>
+        </div>
+    </div>
+</div>

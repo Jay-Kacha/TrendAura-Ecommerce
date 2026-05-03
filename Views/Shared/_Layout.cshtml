@@ -1,0 +1,173 @@
+﻿@{
+    var title = ViewData["Title"] ?? "TrendAura";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title - TrendAura</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="bg-cream text-dark">
+    <header>
+        <nav id="mainNavbar" class="navbar navbar-expand-lg navbar-light sticky-top py-3 shadow-sm bg-transparent">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-logo">TA</span>
+                    <span class="ms-2 brand-text">TrendAura</span>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navMenu">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                        <li class="nav-item px-3"><a class="nav-link nav-menu" style="color:#FFC107;" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li class="nav-item px-3"><a class="nav-link nav-menu" style="color:#FFC107;" asp-controller="Product" asp-action="Index">Products</a></li>
+                        <li class="nav-item px-3"><a class="nav-link nav-menu" style="color:#FFC107;" asp-controller="Home" asp-action="About">About</a></li>
+                    </ul>
+
+                    <form asp-controller="Home" asp-action="Search" method="get" class="search-form me-3 d-flex">
+                        <input type="text" name="q" class="form-control" placeholder="Search products..."
+                               style="background-color: #111111; color: #ffffff; border: 1px solid #FFC107;" />
+                        <button type="submit" class="btn"
+                                style="background-color: #000000; color: #ffffff; border: 1px solid #FFC107;">
+                            <i class="fa-solid fa-search"></i>
+                        </button>
+                    </form>
+
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <!-- Wishlist Button -->
+                        <li class="nav-item me-3">
+                            <a class="nav-link icon-link position-relative wishlist-btn" asp-controller="Wishlist" asp-action="Index" title="My Wishlist">
+                                <i class="fa-regular fa-heart fa-lg"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge badge-counter wishlist-badge bg-danger border border-white" style="display:none;">
+                                    <span class="wishlist-count">0</span>
+                                </span>
+                            </a>
+                        </li>
+
+                        <!-- Cart Button -->
+                        <li class="nav-item me-3">
+                            <a class="nav-link icon-link position-relative cart-btn" asp-controller="Cart" asp-action="Index" title="Shopping Cart">
+                                <i class="fa fa-shopping-cart fa-lg"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge badge-counter cart-badge bg-warning border border-white" style="display:none;">
+                                    <span class="cart-count">0</span>
+                                </span>
+                            </a>
+                        </li>
+
+                        <!-- User Dropdown -->
+                        <li class="nav-item">
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fa-solid fa-user me-1"></i>@User.Identity.Name
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">
+                                            <i class="fa-solid fa-user-edit me-2"></i>My Profile
+                                        </a></li>
+                                        <li><a class="dropdown-item" asp-controller="Profile" asp-action="Orders">
+                                            <i class="fa-solid fa-receipt me-2"></i>My Orders
+                                        </a></li>
+                                        <li><a class="dropdown-item" asp-controller="Wishlist" asp-action="Index">
+                                            <i class="fa-regular fa-heart me-2"></i>Wishlist
+                                        </a></li>
+                                        <li><a class="dropdown-item" asp-controller="Profile" asp-action="ChangePassword">
+                                            <i class="fa-solid fa-key me-2"></i>Change Password
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                                <button class="dropdown-item" type="submit">
+                                                    <i class="fa-solid fa-sign-out-alt me-2"></i>Logout
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            }
+                            else
+                            {
+                                <a class="btn btn-outline-dark btn-sm" style="color:#FFC107;" asp-controller="Account" asp-action="Login">
+                                    <i class="fa-solid fa-sign-in-alt me-1"></i>Login
+                                </a>
+                            }
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-3">
+        @if (TempData["success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show premium-alert-success">
+                <i class="fa-solid fa-check-circle me-2"></i>@TempData["success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show premium-alert-danger">
+                <i class="fa-solid fa-exclamation-circle me-2"></i>@TempData["error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+    </div>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer mt-5">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5 class="text-cream">TrendAura</h5>
+                    <p class="text-muted small">A premium collection of mobile devices curated for elegance and performance.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-cream">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li><a class="footer-link" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a class="footer-link" asp-controller="Product" asp-action="Index">Products</a></li>
+                        @* <li><a class="footer-link" asp-controller="Accessories" asp-action="Index">Mobile Accessories</a></li> *@
+                        <li><a class="footer-link" asp-controller="Home" asp-action="About">About</a></li>
+                        <li><a class="footer-link" asp-controller="Cart" asp-action="Index">Cart</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-cream">Connect With Us</h6>
+                    <div class="mt-3">
+                        <a class="me-3 text-cream" href="#"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a class="me-3 text-cream" href="#"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a class="me-3 text-cream" href="#"><i class="fab fa-twitter fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center small text-cream mt-4">&copy; @DateTime.Now.Year TrendAura. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Navbar shadow on scroll
+        const nav = document.getElementById('mainNavbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) nav.classList.add('nav-scrolled'); else nav.classList.remove('nav-scrolled');
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

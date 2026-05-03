@@ -1,0 +1,165 @@
+@model IEnumerable<trendaura.Models.CartItem>
+@{
+    ViewData["Title"] = "Shopping Cart";
+    decimal total = Model.Sum(item => item.TotalPrice);
+}
+
+<div class="container my-5">
+    <h2 class="mb-4"><i class="fa-solid fa-shopping-cart me-2"></i>Shopping Cart</h2>
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="admin-card">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrEmpty(item.ItemImageUrl))
+                                            {
+                                                <img src="@item.ItemImageUrl" alt="@item.ItemName"
+                                                     style="width:80px;height:80px;object-fit:cover;border-radius:8px;" class="me-3" />
+                                            }
+                                            else
+                                            {
+                                                <div style="width:80px;height:80px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:8px;" class="me-3">
+                                                    <i class="fa-solid fa-image text-muted"></i>
+                                                </div>
+                                            }
+                                            <div>
+                                                <strong>@item.ItemName</strong>
+                                                @if (item.Product != null)
+                                                {
+                                                    <br />
+                                        
+                                                    <small class="text-muted">Product</small>
+                                                }
+                                                else if (item.MobileAccessory != null)
+                                                {
+                                                    <br />
+                                        
+                                                    <small class="text-muted">Mobile Accessory</small>
+                                                    @if (!string.IsNullOrEmpty(item.MobileAccessory.Brand))
+                                                    {
+                                                        <br />
+                                        
+                                                        <small class="text-muted">Brand: @item.MobileAccessory.Brand</small>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <strong class="text-success">Rs @item.ItemPrice.ToString("0.00")</strong>
+                                    </td>
+                                    <td>
+                                        <form asp-action="UpdateQuantity" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <div class="input-group" style="width:120px;">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQty(this, -1)" @(item.Quantity <= 1 ? "disabled" : "")>
+                                                    <i class="fa-solid fa-minus"></i>
+                                                </button>
+                                                <input type="number" name="qty" value="@item.Quantity"
+                                                       min="1" max="@item.ItemStock"
+                                                       class="form-control form-control-sm text-center"
+                                                       onchange="this.form.submit()" />
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQty(this, 1)" @(item.Quantity >= item.ItemStock ? "disabled" : "")>
+                                                    <i class="fa-solid fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </form>
+                                        @if (item.Quantity >= item.ItemStock)
+                                        {
+                                            <small class="text-danger d-block mt-1">Max stock reached</small>
+                                        }
+                                    </td>
+                                    <td>
+                                        <strong class="text-success">Rs @item.TotalPrice.ToString("0.00")</strong>
+                                    </td>
+                                    <td>
+                                        <form asp-action="Remove" method="post" class="d-inline"
+                                              onsubmit="return confirm('Remove this item from cart?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between p-3 bg-light rounded" style="background-color: #1a1a1a !important; border: 1px solid #FFC107;">
+                        <form asp-action="Clear" method="post" onsubmit="return confirm('Clear all items from cart?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fa-solid fa-trash-can me-2"></i>Clear Cart
+                            </button>
+                        </form>
+                        <a asp-controller="Product" asp-action="Index" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-shopping-bag me-2"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="admin-card sticky-top" style="top:20px;">
+                    <h4 class="mb-3">Order Summary</h4>
+                    <hr style="border-color: #FFC107;" />
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal (@Model.Count() items):</span>
+                        <strong>Rs @total.ToString("0.00")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <strong class="text-success">FREE</strong>
+                    </div>
+                    <hr style="border-color: #FFC107;" />
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Total:</h5>
+                        <h5 class="text-success">Rs @total.ToString("0.00")</h5>
+                    </div>
+                    <a asp-controller="Checkout" asp-action="Index" class="btn btn-success w-100 btn-lg">
+                        <i class="fa-solid fa-credit-card me-2"></i>Proceed to Checkout
+                    </a>
+                    <small class="text-muted d-block mt-2 text-center">
+                        <i class="fa-solid fa-lock me-1"></i>Secure Checkout
+                    </small>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="admin-card text-center py-5">
+            <i class="fa-solid fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <h4>Your Cart is Empty</h4>
+            <p class="text-muted mb-4">Looks like you haven't added any items to your cart yet.</p>
+            <div class="d-flex gap-2 justify-content-center">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-primary">
+                    <i class="fa-solid fa-shopping-bag me-2"></i>Browse Products
+                </a>
+                <a asp-controller="Accessories" asp-action="Index" class="btn btn-outline-primary">
+                    <i class="fa-solid fa-headphones me-2"></i>Browse Accessories
+                </a>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,60 @@
+@model IEnumerable<trendaura.Models.Order>
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4"><i class="fa-solid fa-receipt me-2"></i>My Orders</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="admin-card text-center py-5">
+            <i class="fa-solid fa-receipt fa-3x text-muted mb-3"></i>
+            <h4>No orders yet</h4>
+            <p class="text-muted">Start shopping to see your orders here!</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">
+                <i class="fa-solid fa-store me-2"></i>Start Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="admin-card">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var o in Model)
+                        {
+                            <tr>
+                                <td><strong>#@o.Id</strong></td>
+                                <td>@o.OrderDate.ToLocalTime().ToString("MMM dd, yyyy")</td>
+                                <td>@o.Items?.Count items</td>
+                                <td><strong>Rs @o.TotalAmount.ToString("0.00")</strong></td>
+                                <td>
+                                    <span class="badge bg-@(o.Status == "Delivered" ? "success" : o.Status == "Cancelled" ? "danger" : "warning")">
+                                        @o.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <a asp-controller="Checkout" asp-action="Success" asp-route-id="@o.Id" class="btn btn-sm btn-primary">
+                                        <i class="fa-solid fa-eye me-1"></i>View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

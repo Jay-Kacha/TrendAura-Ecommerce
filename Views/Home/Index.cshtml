@@ -1,0 +1,145 @@
+﻿@model IEnumerable<trendaura.Models.Product>
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- Modern Hero Section -->
+<section class="hero-modern">
+    <div class="hero-container">
+        <!-- Left Content -->
+        <div class="hero-content">
+            <div class="hero-content-inner">
+                <h1 class="hero-title">
+                    Everything <span class="highlight">You Need,</span> All in One Place.
+                </h1>
+                <p class="hero-subtitle">
+                    Discover the latest flagship devices, exclusive accessories, and innovative tech lifestyle products. Experience luxury meets performance with TrendAura's curated collection.
+                </p>
+                <div class="hero-buttons">
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-primary hero-btn hero-btn-primary">
+                        <i class="fa-solid fa-shopping-bag me-2"></i>Shop Now
+                    </a>
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-primary hero-btn hero-btn-secondary">
+                        <i class="fa-solid fa-mobile me-2"></i>Explore Products
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <h4 class="stat-number">500+</h4>
+                        <p class="stat-label">Premium Products</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4 class="stat-number">10K+</h4>
+                        <p class="stat-label">Happy Customers</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4 class="stat-number">24/7</h4>
+                        <p class="stat-label">Customer Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Image -->
+        <div class="hero-image">
+            <div class="hero-image-wrapper">
+                <img src="/images/hiro.png" alt="Premium Smartphones" class="hero-img" />
+                <div class="hero-image-accent"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Container for Content -->
+<div class="container-xl" style="padding: 0 20px;">
+    <!-- Categories Section -->
+    <section class="categories-section">
+        <h4>Categories</h4>
+        <div class="categories-grid">
+            @if (ViewBag.Categories != null)
+            {
+                foreach (var c in ViewBag.Categories as List<trendaura.Models.Category>)
+                {
+                    <div class="col-auto">
+                        <a asp-controller="Product" asp-action="Index" asp-route-categoryId="@c.Id" class="text-decoration-none">
+                            <div class="admin-card">
+                                <strong>@c.Name</strong>
+                            </div>
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+    </section>
+
+    <!-- Featured Products Section -->
+    <section class="featured-products-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h4 style="margin: 0;">Featured Products</h4>
+            <a asp-controller="Product" asp-action="Index" class="text-muted small" style="font-size: 0.9rem;">View all →</a>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="products-grid">
+            @foreach (var p in Model)
+            {
+                <div class="product-card">
+                    <!-- Product Image -->
+                    <div class="img-wrap">
+                        <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/placeholder.png" : p.ImageUrl)" alt="@p.Name" />
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="card-body">
+                        <!-- Product Name and Category -->
+                        <div style="margin-bottom: 8px;">
+                            <h6>@p.Name</h6>
+                            <div class="text-muted">@p.Category?.Name</div>
+                        </div>
+
+                        <!-- Star Rating -->
+                        @if (p.ReviewCount > 0)
+                        {
+                            <div class="star-rating-small" style="margin-bottom: 10px;">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Floor(p.AverageRating))
+                                    {
+                                        <i class="fa-solid fa-star"></i>
+                                    }
+                                    else if (i == Math.Ceiling(p.AverageRating) && p.AverageRating % 1 >= 0.5)
+                                    {
+                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-regular fa-star"></i>
+                                    }
+                                }
+                                <span class="text-muted" style="margin-left: 4px;">(@p.ReviewCount)</span>
+                            </div>
+                        }
+
+                        <!-- Price -->
+                        <div class="price">Rs @p.Price.ToString("0.00")</div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex">
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@p.Id" class="btn btn-outline-primary btn-sm" style="flex: 1;">
+                                <i class="fa-solid fa-eye me-1"></i>View
+                            </a>
+                            <form asp-controller="Cart" asp-action="Add" method="post" style="flex: 1; margin-left: 8px;">
+                                <input type="hidden" name="productId" value="@p.Id" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">
+                                    <i class="fa-solid fa-cart-plus me-1"></i>Add
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+

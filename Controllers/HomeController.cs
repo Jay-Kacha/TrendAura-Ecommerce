@@ -18,7 +18,7 @@ namespace trendaura.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Featured products loading logic
+            // Featured products loading logic - you can customize this as needed
             var featuredProducts = await _db.Products
                 .Include(p => p.Category)
                 .Include(p => p.Reviews)

@@ -72,7 +72,7 @@ namespace trendaura.Controllers
             user.ZipCode = model.ZipCode;
             user.Country = model.Country;
 
-            // Update email if changed
+            // Update email if changed - this also updates the username to match the email
             if (user.Email != model.Email)
             {
                 var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
